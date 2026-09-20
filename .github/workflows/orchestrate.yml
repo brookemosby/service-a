@@ -1,0 +1,46 @@
+name: Orchestrate Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      event:
+        required: true
+        default: deploy
+      source_repo:
+        required: true
+      branch:
+        required: false
+      git_sha:
+        required: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: us-east-1
+  GITHUB_OWNER: ${{ github.repository_owner }}
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync preview environments
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          GITHUB_TOKEN: ${{ secrets.GH_DISPATCH_TOKEN || secrets.GITHUB_TOKEN }}
+          ECR_SERVICE_A_URI: ${{ secrets.ECR_SERVICE_A_URI }}
+          ECR_SERVICE_B_URI: ${{ secrets.ECR_SERVICE_B_URI }}
+          PREVIEW_EVENT: ${{ inputs.event }}
+          TRIGGER_REPO: ${{ inputs.source_repo }}
+          TRIGGER_BRANCH: ${{ inputs.branch }}
+          TRIGGER_SHA: ${{ inputs.git_sha }}
+        run: python3 infra/preview.py
