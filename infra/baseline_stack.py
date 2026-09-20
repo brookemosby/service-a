@@ -83,6 +83,10 @@ class BaselineStack(Stack):
             "GitHubOidc",
             url="https://token.actions.githubusercontent.com",
             client_ids=["sts.amazonaws.com"],
+            thumbprints=[
+                "6938fd04d4836e0b163a24601d5cc7360e5e5bc0",
+                "1c58a3a8518e8759bf075b76b750d4f2df264fcd",
+            ],
         )
 
         deploy_role = iam.Role(
@@ -96,8 +100,8 @@ class BaselineStack(Stack):
                     },
                     "StringLike": {
                         "token.actions.githubusercontent.com:sub": [
-                            f"repo:{github_org}/{github_repo_a}:*",
-                            f"repo:{github_org}/{github_repo_b}:*",
+                            f"repo:{github_org}@*/{github_repo_a}@*:*",
+                            f"repo:{github_org}@*/{github_repo_b}@*:*",
                         ],
                     },
                 },
