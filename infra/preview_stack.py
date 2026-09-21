@@ -157,7 +157,7 @@ class PreviewStack(Stack):
                 self,
                 f"{service_id}TargetGroup",
                 vpc=vpc,
-                port=80,
+                port=8000,
                 protocol=elbv2.ApplicationProtocol.HTTP,
                 target_type=elbv2.TargetType.IP,
                 health_check=elbv2.HealthCheck(
