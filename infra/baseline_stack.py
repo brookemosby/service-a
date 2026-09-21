@@ -78,6 +78,12 @@ class BaselineStack(Stack):
             ),
         )
 
+        self.alb.connections.allow_to(
+            ec2.Peer.ipv4(self.vpc.vpc_cidr_block),
+            ec2.Port.tcp(8000),
+            "Health checks and traffic to ECS tasks",
+        )
+
         oidc_provider = iam.OpenIdConnectProvider(
             self,
             "GitHubOidc",
